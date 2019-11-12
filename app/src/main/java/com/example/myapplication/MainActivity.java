@@ -1,14 +1,10 @@
 package com.example.myapplication;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Base64;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import retrofit2.Call;
@@ -19,50 +15,54 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends Activity {
 
-    ImageView imageView;
     String BASE_URL = "http://10.0.2.2:8000/";
+    EditText orgName;
+    EditText add;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        imageView = (ImageView) findViewById((R.id.img));
+        orgName = (EditText)findViewById(R.id.orgName);
+        add = (EditText)findViewById(R.id.add);
     }
 
-    public void fun(View view){
+    public void render(View view){
+        Intent intent = new Intent(this,webViewActivity.class);
+        startActivity(intent);
+    }
+
+    public void postData(View view){
+        String org = orgName.getText().toString();
+        String address = add.getText().toString();
+        //Toast.makeText(getApplicationContext(),org+" "+address,Toast.LENGTH_SHORT).show();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        DemoApi demoApi = retrofit.create(DemoApi.class);
-        Call<Post> call = demoApi.getPosts();
-
-        call.enqueue(new Callback<Post>() {
+        ShopApi shopApi = retrofit.create(ShopApi.class);
+        Shop shop = new Shop(org,address);
+        Call<Shop> shopCall = shopApi.create(shop);
+        shopCall.enqueue(new Callback<Shop>() {
             @Override
-            public void onResponse(Call<Post> call, Response<Post> response) {
+            public void onResponse(Call<Shop> call, Response<Shop> response) {
                 if(!response.isSuccessful()){
                     Toast.makeText(getApplicationContext(),response.code(),Toast.LENGTH_LONG).show();
                 }
-                Post post = response.body();
-                String msg = "name :" + post.getName() + "\n"
-                        + "sentFrom : " + post.getSentFrom() + "\n"
-                        + "time : " + post.getTime() + "\n"
-                        + "msg : " + post.getMsg();
-                //Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_LONG).show();
-
-                String base64String = post.getMsg();
-                String base64Image = base64String.split(",")[1];
-
-                byte[] decodedString = Base64.decode(base64Image, Base64.DEFAULT);
-                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-                imageView.setImageBitmap(decodedByte);
+                Shop shopResponse = response.body();
+                String content = shopResponse.getOrgName() + shopResponse.getAddress();
+                Toast.makeText(getApplicationContext(),content,Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onFailure(Call<Post> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), t.getMessage(), Toast.LENGTH_LONG).show();
+            public void onFailure(Call<Shop> call, Throwable t) {
+                Toast.makeText(getApplicationContext(),t.getMessage(),Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void openActivity2(View view){
+        Intent intent = new Intent(this,Activity2.class);
+        startActivity(intent);
     }
 }
