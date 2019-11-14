@@ -27,11 +27,6 @@ public class MainActivity extends Activity {
         add = (EditText)findViewById(R.id.add);
     }
 
-    public void render(View view){
-        Intent intent = new Intent(this,webViewActivity.class);
-        startActivity(intent);
-    }
-
     public void postData(View view){
         String org = orgName.getText().toString();
         String address = add.getText().toString();
@@ -59,6 +54,18 @@ public class MainActivity extends Activity {
                 Toast.makeText(getApplicationContext(),t.getMessage(),Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    //Open new activity
+
+    public void openActivityItems(View view){
+        Intent intent = new Intent(this,items.class);
+        startActivity(intent);
+    }
+
+    public void render(View view){
+        Intent intent = new Intent(this,webViewActivity.class);
+        startActivity(intent);
     }
 
     public void openActivity2(View view){
