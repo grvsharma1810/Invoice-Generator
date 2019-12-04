@@ -1,4 +1,6 @@
 # Invoice-Generator
+This app can be used to generate a digital invoice for the customers. This app has been designed keeping in mind the small businesses and shops.
+
 For Local Host -
 
 1. Clone the repository.
